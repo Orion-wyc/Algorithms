@@ -1,0 +1,55 @@
+123abcxyz
+#include <condition_variable>
+#include <iostream>
+#include <mutex>
+#include <thread>
+
+std::mutex mtx;
+std::condition_variable cv;
+bool ready = false;  // 全局标志位
+
+void printId(int id) {
+  std::unique_lock<std::mutex> lck(mtx);
+  // 如果标志位不为true，则等待
+  // while (!ready) {
+  //   // 线程被阻塞，直到标志位变为true，此时 mtx 被释放，go 线程能够获取到锁。
+  //   cv.wait(lck);
+  // }
+  // 上面的for循环等同于 
+  cv.wait(lck, [](){return ready;});
+  std::cout << "thread: " << std::this_thread::get_id() << " id: " << id
+            << "\n";
+}
+
+void go() {
+  std::unique_lock<std::mutex> lck(mtx);
+  // 改变全局标志位
+  ready = true;
+  // 唤醒所有线程
+  cv.notify_all();
+}
+
+int main() {
+  std::thread threads[10];
+
+  for (int i = 0; i < 10; ++i) {
+    threads[i] = std::thread(printId, i);
+  }
+  std::cout << "create done.\n";
+
+  go();
+
+  for (auto &t : threads) {
+    t.join();
+  }
+  std::cout << "process done.\n";
+  return 0;
+}
+
+3
+100 100 100 100
+100 1 1 1
+100 100 1 100
+100 100 1 1
+100 20 12 25
+100 23 9 261
