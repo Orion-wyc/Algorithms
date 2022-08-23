@@ -12,3 +12,5 @@
 *.log
 *.exe
 /.vscode
+*.s
+./cpp_demos

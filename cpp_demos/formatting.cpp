@@ -6,19 +6,20 @@ using namespace std;
 
 struct Node {
   int a;
-  double b;
-  float c;
+  char *str = new char[10];
 };
 
-class A {
-  Node a;
-};
-
-class B {
-  Node *b;
-};
-
+void InputInt(int* num) { cout << *num << endl; }
 int main() {
-  cout << sizeof(A) << sizeof(B) << endl;
-  return 0;
+  const int constant = 21;
+  // InputInt(constant); //error C2664: “InputInt”: 不能将参数 1 从“const
+  // int”转换为“int *”
+  InputInt(const_cast<int*>(&constant));
+
+  cout << sizeof(Node) << endl;
+  Node node;
+  cout << sizeof node << endl;
+  delete node.str;
+
+  system("pause");
 }
